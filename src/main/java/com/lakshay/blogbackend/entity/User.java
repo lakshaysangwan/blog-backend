@@ -1,7 +1,7 @@
 package com.lakshay.blogbackend.entity;
 
 import com.lakshay.blogbackend.error.custom_error.sign_up.SignUpException;
-import com.lakshay.blogbackend.error.custom_error.sign_up.enums.SignUpExceptions;
+import com.lakshay.blogbackend.error.custom_error.sign_up.enums.SignUpExceptionCodes;
 import com.lakshay.blogbackend.utilities.Utilities;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -27,6 +27,6 @@ public class User {
         if (Utilities.isValidEmail(email))
             return new User(id, firstname, middleName, lastname, username, email, Utilities.hashPassword(password));
         else
-            throw new SignUpException(SignUpExceptions.INVALID_EMAIL_ID.getCode(), "Email id can either be null or a valid email");
+            throw new SignUpException(SignUpExceptionCodes.INVALID_EMAIL_ID.getCode(), "Email id can either be null or a valid email");
     }
 }

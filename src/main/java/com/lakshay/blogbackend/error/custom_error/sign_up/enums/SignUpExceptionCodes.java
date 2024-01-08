@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum SignUpExceptions {
+public enum SignUpExceptionCodes {
     INVALID_EMAIL_ID("INVALID_EMAIL_ID"),
     EMAIL_ALREADY_EXIST("EMAIL_ALREADY_EXIST"),
     USERNAME_ALREADY_EXIST("USERNAME_ALREADY_EXIST");

@@ -5,8 +5,11 @@ import com.lakshay.blogbackend.dto.UserDTO;
 import com.lakshay.blogbackend.entity.User;
 import com.lakshay.blogbackend.error.custom_error.sign_in.SignInException;
 import com.lakshay.blogbackend.error.custom_error.sign_up.SignUpException;
+import com.lakshay.blogbackend.repository.UserRepository;
 import com.lakshay.blogbackend.service.Authenticate;
 import com.lakshay.blogbackend.service.UserService;
+import com.lakshay.blogbackend.utilities.Utilities;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
@@ -34,6 +37,9 @@ public class UserController {
     @Autowired
     private Authenticate authenticate;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @PostMapping("/signup")
     public ResponseEntity<Object> signup(@Valid @RequestBody UserDTO userDto) {
         try {
@@ -59,6 +65,15 @@ public class UserController {
     public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO loginDTO, HttpServletResponse response) {
         try {
             User user = authenticate.verifyUser(loginDTO);
+            String token = Utilities.generateToken(user); // Implement token generation logic
+
+            Cookie authCookie = new Cookie("auth", token);
+            authCookie.setHttpOnly(true);
+            authCookie.setSecure(false); // Set to false if not using HTTPS
+            authCookie.setMaxAge(7 * 24 * 60 * 60); // For example, 7 days
+            authCookie.setPath("/");
+            response.addCookie(authCookie);
+
             return ResponseEntity.ok(user);
         } catch (SignInException exception) {
             log.error(exception);

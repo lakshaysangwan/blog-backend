@@ -2,6 +2,7 @@ package com.lakshay.blogbackend.error;
 
 import com.lakshay.blogbackend.error.custom_error.sign_in.SignInException;
 import com.lakshay.blogbackend.error.custom_error.sign_up.SignUpException;
+import com.lakshay.blogbackend.error.custom_error.token_validation.ValidationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,13 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     private static final String TIMESTAMP = "timestamp";
     private static final String MESSAGE = "message";
+    private static final String ERROR_CODE = "error_code";
 
     @ExceptionHandler(SignUpException.class)
     public Object handleSignUpExceptions(SignUpException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
-        body.put("error_code", ex.getExceptionCode());
+        body.put(ERROR_CODE, ex.getExceptionCode());
         body.put(MESSAGE, ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
@@ -34,7 +36,17 @@ public class GlobalExceptionHandler {
     public Object handleSignInExceptions(SignInException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
-        body.put("error_code", ex.getExceptionCode());
+        body.put(ERROR_CODE, ex.getExceptionCode());
+        body.put(MESSAGE, ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public Object handleValidationExceptions(ValidationException ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(ERROR_CODE, ex.getExceptionCode());
         body.put(MESSAGE, ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
