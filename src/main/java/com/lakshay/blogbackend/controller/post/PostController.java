@@ -1,13 +1,10 @@
-package com.lakshay.blogbackend.controller.user;
+package com.lakshay.blogbackend.controller.post;
 
-import com.lakshay.blogbackend.dto.LoginDTO;
-import com.lakshay.blogbackend.dto.UserDTO;
-import com.lakshay.blogbackend.entity.User;
+import com.lakshay.blogbackend.dto.PostDTO;
+import com.lakshay.blogbackend.exception.custom_exception.authentication_exception.AuthenticationException;
 import com.lakshay.blogbackend.exception.custom_exception.user_exception.UserException;
-import com.lakshay.blogbackend.service.Authenticate;
-import com.lakshay.blogbackend.service.UserService;
+import com.lakshay.blogbackend.service.PostService;
 import com.lakshay.blogbackend.utilities.CookieUtils;
-import com.lakshay.blogbackend.utilities.Mappers;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -25,24 +22,21 @@ import java.util.Map;
 
 @Log4j2
 @RestController
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping("/post")
+public class PostController {
     private static final String TIMESTAMP = "timestamp";
     private static final String MESSAGE = "message";
     private static final String ERROR_CODE = "errorCode";
 
     @Autowired
-    private UserService userService;
-    @Autowired
-    private Authenticate authenticate;
-    @Autowired
-    private Mappers mappers;
+    private PostService postService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<Object> signup(@Valid @RequestBody UserDTO userDto) {
+    @PostMapping("/add")
+    public ResponseEntity<Object> addPost(@Valid @RequestBody PostDTO postDTO, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         try {
-            UserDTO user = userService.signupService(userDto);
-            return ResponseEntity.ok(user);
+            CookieUtils.verifyRequest(postDTO.getUsername(), httpServletRequest);
+            CookieUtils.refreshUserCookie(postDTO.getUsername(), httpServletRequest, httpServletResponse);
+            return ResponseEntity.ok(postService.addPost(postDTO));
         } catch (UserException exception) {
             log.error(exception);
             Map<String, String> errorResponse = new HashMap<>();
@@ -50,24 +44,7 @@ public class UserController {
             errorResponse.put(ERROR_CODE, exception.getExceptionCode());
             errorResponse.put(MESSAGE, exception.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
-        } catch (Exception exception) {
-            log.error(exception);
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put(TIMESTAMP, LocalDateTime.now().toString());
-            errorResponse.put(MESSAGE, exception.getMessage());
-            return ResponseEntity.internalServerError().body(errorResponse);
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<Object> login(@Valid @RequestBody LoginDTO loginDTO, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            User user = authenticate.verifyLogin(loginDTO);
-            CookieUtils.refreshUserCookie(user.getUsername(), request, response); // Implement token generation logic
-            UserDTO userDTO = mappers.convertUserToUserDTO(user);
-            userDTO.setPassword(null);
-            return ResponseEntity.ok(userDTO);
-        } catch (UserException exception) {
+        } catch (AuthenticationException exception) {
             log.error(exception);
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put(TIMESTAMP, LocalDateTime.now().toString());
