@@ -1,8 +1,7 @@
-package com.lakshay.blogbackend.error;
+package com.lakshay.blogbackend.exception;
 
-import com.lakshay.blogbackend.error.custom_error.sign_in.SignInException;
-import com.lakshay.blogbackend.error.custom_error.sign_up.SignUpException;
-import com.lakshay.blogbackend.error.custom_error.token_validation.ValidationException;
+import com.lakshay.blogbackend.exception.custom_exception.authentication_exception.AuthenticationException;
+import com.lakshay.blogbackend.exception.custom_exception.user_exception.UserException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,8 @@ public class GlobalExceptionHandler {
     private static final String MESSAGE = "message";
     private static final String ERROR_CODE = "error_code";
 
-    @ExceptionHandler(SignUpException.class)
-    public Object handleSignUpExceptions(SignUpException ex) {
+    @ExceptionHandler(AuthenticationException.class)
+    public Object handleValidationExceptions(AuthenticationException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
         body.put(ERROR_CODE, ex.getExceptionCode());
@@ -32,18 +31,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(SignInException.class)
-    public Object handleSignInExceptions(SignInException ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put(TIMESTAMP, LocalDateTime.now());
-        body.put(ERROR_CODE, ex.getExceptionCode());
-        body.put(MESSAGE, ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    public Object handleValidationExceptions(ValidationException ex) {
+    @ExceptionHandler(UserException.class)
+    public Object handleUserExceptions(UserException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
         body.put(ERROR_CODE, ex.getExceptionCode());

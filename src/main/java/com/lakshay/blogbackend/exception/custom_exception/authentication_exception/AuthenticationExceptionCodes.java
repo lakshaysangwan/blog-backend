@@ -1,11 +1,11 @@
-package com.lakshay.blogbackend.error.custom_error.token_validation.enums;
+package com.lakshay.blogbackend.exception.custom_exception.authentication_exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ValidationExceptionCodes {
+public enum AuthenticationExceptionCodes {
     INVALID_TOKEN("INVALID_TOKEN"),
     UNAUTHORIZED("UNAUTHORIZED");
     private final String code;
